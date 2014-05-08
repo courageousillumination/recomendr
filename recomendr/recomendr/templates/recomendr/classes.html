@@ -5,7 +5,7 @@
 <thead>
     <td>Title</td>
 {% for class in classes %}
-    <tr><td>{{ class.title }}</td></tr>
+    <tr><td><a href="/courses/{{ class.id }}">{{ class.title }}</a></td></tr>
 {% endfor %}
 </table>
 {% endblock %}
