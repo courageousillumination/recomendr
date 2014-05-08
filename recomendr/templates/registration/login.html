@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="messages">
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}}">
+        <a class="close" data-dismiss="alert">×</a>
+        {{message}}
+    </div>
+    {% endfor %}
+{% endif %}
+</div> <!-- End messages -->
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+<form name="loginform" class="form form-alone" method="post" action="{% url 'django.contrib.auth.views.login' %}">{% csrf_token %}
+<div class="control-group">
+    <label class="control-label" for="inputEmail">{{ form.username.label_tag }}</label>
+    <div class="controls">
+      {{ form.username }}
+    </div>
+</div>
+<div class="control-group">
+    <label class="control-label" for="inputEmail">{{ form.password.label_tag }}</label>
+    <div class="controls">
+      {{ form.password }}
+    </div>
+</div>
+
+<div class="control-group">
+    <div class="controls">
+      <input class="btn" type="submit" value="login"/>
+    </div>
+</div>
+<input type="hidden" name="next" value="{{ next }}"/>
+</form>
+{% endblock %}

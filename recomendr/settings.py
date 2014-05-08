@@ -53,7 +53,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = os.path.join(SITE_ROOT, '/media/')
+MEDIA_ROOT = os.path.join(SITE_ROOT, 'media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -64,7 +64,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = os.path.join(SITE_ROOT, '/static/')
+STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -111,6 +111,7 @@ ROOT_URLCONF = 'recomendr.urls'
 WSGI_APPLICATION = 'recomendr.wsgi.application'
 
 TEMPLATE_DIRS = (
+    os.path.join(SITE_ROOT, "templates"),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -124,9 +125,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'recomendr.recomendr',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
@@ -159,3 +161,28 @@ LOGGING = {
         },
     }
 }
+
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+"django.contrib.auth.context_processors.auth",
+"django.core.context_processors.debug",
+"django.core.context_processors.i18n",
+"django.core.context_processors.media",
+"django.core.context_processors.static",
+"django.core.context_processors.tz",
+"django.contrib.messages.context_processors.messages",
+"django.core.context_processors.request",
+)
+
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/login/"
+
+AUTH_LDAP_SERVER_URI = "ldaps://ldap.uchicago.edu"
+AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,dc=uchicago,dc=edu"
+AUTH_LDAP_USER_ATTR_MAP = {"first_name": "eduPersonNickname", "last_name": "sn", "email": "mail"}
+AUTH_LDAP_ALWAYS_UPDATE_USER = False
