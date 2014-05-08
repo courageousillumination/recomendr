@@ -1,8 +1,6 @@
 Django==1.6.4
 South==0.8.4
-argparse==1.2.1
 beautifulsoup4==4.3.2
 django-auth-ldap==1.2.0
 lxml==3.3.5
 python-ldap==2.4.15
-wsgiref==0.1.2

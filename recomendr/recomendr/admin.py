@@ -1,4 +1,4 @@
 from django.contrib import admin
-from recomendr.recomendr.models import Class
+from recomendr.recomendr.models import Course
 
-admin.site.register(Class)
+admin.site.register(Course)
