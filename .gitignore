@@ -1,2 +1,5 @@
 venv
 *.pyc
+*.db
+recomendr/static
+recomendr/media
