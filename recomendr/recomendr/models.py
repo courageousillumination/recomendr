@@ -1,5 +1,9 @@
 from django.db import models
 
+class Professor(models.Model):
+    name = models.CharField(max_length = 128)
+    
+
 class Class(models.Model):
     
     FALL = 'FA'
@@ -18,5 +22,10 @@ class Class(models.Model):
     quarter = models.CharField(max_length=2,
                                choices=QUARTER_CHOICES)
     title = models.CharField(max_length = 512)
+    department = models.CharField(max_length = 4)
+    course_number = models.IntegerField()
     description = models.TextField()
+    professor = models.ForeignKey(Professor)
+   
+    
     

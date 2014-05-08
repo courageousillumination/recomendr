@@ -1,0 +1,11 @@
+{% extends "recomendr/base.html" %}
+
+{% block content %}
+<table class="table">
+<thead>
+    <td>Title</td>
+{% for class in classes %}
+    <tr><td>{{ class.title }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
