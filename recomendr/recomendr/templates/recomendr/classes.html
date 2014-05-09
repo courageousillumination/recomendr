@@ -3,7 +3,7 @@
 {% block content %}
 <table class="table">
 <thead>
-    <td>Title</td>
+    <td>Course Number</td><td>Title</td>
 {% for class in classes %}
     <tr><td>{{ class.department }} {{ class.course_number }}</td><td><a href="/courses/{{ class.id }}">{{ class.title }}</a></td></tr>
 {% endfor %}
