@@ -61,17 +61,17 @@ links = """
 <li><a href="/thecollege/tutorialstudies/">Tutorial Studies</a></li>
 <li><a href="/thecollege/visualarts/">Visual Arts</a></li>
 """
+#courses = pickle.load(open("scraper/all_classes.p", "rb"))
+#l = []
+#for course in courses:
+#...     l.append(Course(description = course["description"], title=course["name"], course_number = course["id"].split(u'\xa0')[1], department = course["id"].split(u'\xa0')[0]))
+#Course.objects.bulk_create(l)
 
 urls = [base_url + x for x in re.findall('(?<=<li><a href=").+(?=")', links)]
-html = []
-for x in urls:
-    html.append(requests.get(x).text)
-    print "Got {0}".format(x)
-print "Got all the webpages."
 
 all_classes = []
-for doc in html:
-    tree = lxml.html.fromstring(doc)
+for x in urls:
+    tree = lxml.html.fromstring(requests.get(x).text)
 
     elements = list(tree.find_class("courseblock"))
 
@@ -79,19 +79,26 @@ for doc in html:
         element = elements[i]
         
         #No sequences
-        if i < len(elements) - 1 and "subsequence" in elements[i+1].values()[0]:
+        if i < len(elements) - 1 and "subsequence" in elements[i+1].values()[0] and not "subsequence" in element.values()[0]:
             continue
         #Extract the title information
         
-        title = element.find_class("courseblocktitle")[0].getchildren()[0].text
-        a = title.split('.')
-        identifier = a[0].strip()
-        name = a[1].strip()
+        title = element.find_class("courseblocktitle")[0].getchildren()[0].text_content()
+        a = title.split('.', 1)
+        identifier = a[0].strip().replace(u'\xa0', ' ')
+        try:
+            name = re.search(".*(?=[0-9]{3}.+Units)", a[1]).group(0).strip()
+        except:
+            print title
+            
         
         #Extract the description
-        description = element.find_class("courseblockdesc")[0].text
         
-        all_classes.append({"name": name, "id": identifier, "description":description})
+        description = element.find_class("courseblockdesc")[0].text_content()
         
         
+        
+        all_classes.append({"name": unicode(name), "id": unicode(identifier), "description": unicode(description)})
+    print "Processed {0}".format(x)
+
 pickle.dump(all_classes, open("all_classes.p", "wb"))
