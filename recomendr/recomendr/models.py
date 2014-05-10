@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Professor(models.Model):
     name = models.CharField(max_length = 128)
@@ -9,6 +10,7 @@ class Course(models.Model):
     department = models.CharField(max_length = 4)
     course_number = models.IntegerField()
     description = models.TextField()
+    taken_by = models.ManyToManyField(User)
     
 class CourseInstance(models.Model):
     
@@ -30,3 +32,5 @@ class CourseInstance(models.Model):
     
     professor = models.ForeignKey(Professor)
     course = models.ForeignKey(Course)
+    
+    

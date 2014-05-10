@@ -68,7 +68,8 @@ from recomendr.recomendr.models import *
 courses = pickle.load(open("scraper/all_classes.p", "rb"))
 l = []
 for course in courses:
-     l.append(Course(description = course["description"], title=course["name"], course_number = course["id"].split(u'\xa0')[1], department = course["id"].split(u'\xa0')[0]))
+     l.append(Course(description = course["description"], title=course["name"], course_number = course["id"].split(u' ')[1], department = course["id"].split(u' ')[0]))
+
 Course.objects.bulk_create(l)
 """
 urls = [base_url + x for x in re.findall('(?<=<li><a href=").+(?=")', links)]

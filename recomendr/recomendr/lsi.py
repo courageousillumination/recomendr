@@ -29,8 +29,18 @@ def get_similar(document, dictionary, lda, index):
     return [(x, y) for x, y in list(enumerate(sims)) if y != 1.0]
 
 def get_similar_courses(course, num_courses):
-    r = get_similar(course.description, DICTIONARY, LSI, INDEX)
-    return Course.objects.filter(id__in = [x[0] for x in heapq.nlargest(num_courses, r, key= lambda x: x[1]) if x[1] > 0.7])
+    r = get_similar(course.title + ' ' + course.description, DICTIONARY, LSI, INDEX)
+    return Course.objects.filter(id__in = [x[0] for x in heapq.nlargest(num_courses, r, key= lambda x: x[1])])
+
+def get_similar_courses_list(courses, num_similar):
+    course_ids = set(x.id for x in courses)
+    x = [DICTIONARY.doc2bow(process_string(course.title + ' ' + course.description)) for course in courses]
+    sim = INDEX[LSI[x]]
+    summed = sim[0]
+    for i in range(1, len(sim)):
+        summed += sim[i]
+    sim = [(x, y) for x, y in list(enumerate(summed)) if x not in course_ids]
+    return Course.objects.filter(id__in = [x[0] for x in heapq.nlargest(num_similar, sim, key= lambda x: x[1])])
 
 #Upon importing this we check to see if the files exist. If they
 #don't we have to create them
@@ -40,7 +50,7 @@ try:
 except IOError:
     documents = []
     for course in Course.objects.all():
-        documents.append(course.description)
+        documents.append(course.title + ' ' + course.description)
     print "Couldn't find similarity matrix, rebuilding... (this could take a while)"
     documents = [DICTIONARY.doc2bow(process_string(x)) for x in documents]
     INDEX = similarities.MatrixSimilarity(LSI[documents], num_features=100000)

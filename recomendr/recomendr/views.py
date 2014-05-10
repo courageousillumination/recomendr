@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
+from django.contrib.auth.decorators import login_required
 
 from recomendr.recomendr.models import *
-
 import recomendr.recomendr.lsi
 
 
@@ -28,3 +28,20 @@ def search(request):
         return render(request, "recomendr/classes.html", {"classes": courses})
         
     return redirect('index')
+
+@login_required
+def my_courses(request):
+    if request.method == "POST":
+        name = request.POST["course_name"]
+        try:
+            course = Course.objects.get(title = name)
+        except:
+            course = None
+        if course:
+            request.user.course_set.add(course)
+            
+    courses = Course.objects.all()
+    my_courses = request.user.course_set.all()
+    similar_courses = recomendr.recomendr.lsi.get_similar_courses_list(my_courses, 5)    
+    
+    return render(request, "recomendr/my_courses.html", {"courses" : courses, "my_courses" : my_courses, "suggested_courses" : similar_courses})
