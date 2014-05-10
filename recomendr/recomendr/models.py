@@ -16,6 +16,9 @@ class Tag(models.Model):
     tag_name = models.CharField(max_length=512)
     courses = models.ManyToManyField(Course)
     
+    def sample_courses(self):
+        return self.courses.all()[:5]
+    
 class CourseInstance(models.Model):
     
     FALL = 'FA'

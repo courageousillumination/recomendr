@@ -46,6 +46,14 @@ def search(request):
 def random_course(request):
     return redirect('recomendr.course_page', course_id=random.randint(1, Course.objects.count()))
 
+def topics(request):
+    topics = Tag.objects.all()
+    return render(request, "recomendr/topic_list.html", { "topics" : topics })
+
+def topic_page(request, topic_id):
+    topic = get_object_or_404(Tag, id = topic_id)
+    return render(request, "recomendr/topic_page.html", {"topic" : topic})
+    
 @login_required
 def my_courses(request):
     if request.method == "POST":

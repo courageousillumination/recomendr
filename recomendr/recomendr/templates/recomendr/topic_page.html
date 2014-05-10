@@ -1,0 +1,13 @@
+{% extends "recomendr/base.html" %}
+
+{% block content %}
+<h3>All classes related to <strong>{{ topic.tag_name }}</strong></h3>
+<table class="table">
+<thead>
+    <td>Course ID</td><td>Course Title</td>
+</thead>
+{% for course in topic.courses.all %}
+    <tr><td>{{ course.department }} {{ course.course_number }}</td><td><a href="/courses/{{ course.id }}">{{ course.title }}</a></td></tr>
+{% endfor %}
+</table>
+{% endblock %}
