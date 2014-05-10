@@ -1,0 +1,30 @@
+{% extends "recomendr/base.html" %}
+
+{% block content %}
+<div class="col-md-6">
+<h2>My Courses</h2>
+<table class="table">
+<thead>
+    <td>Course Number</td><td>Title</td>
+{% for class in my_courses %}
+    <tr><td>{{ class.department }} {{ class.course_number }}</td><td><a href="/courses/{{ class.id }}">{{ class.title }}</a></td></tr>
+{% endfor %}
+</table>
+
+Add another course! <form method="post" action="#">
+{% csrf_token %}
+<input name="course_name" id="class_search" type="text" data-provide="typeahead" autocomplete="off" class="tt-query"></input>
+<button type="submit" class="btn btn-default">Submit</button>
+</form>
+</div>
+<div class="col-md-6">
+<h2>Suggested Courses for you</h2>
+<table class="table">
+<thead>
+    <td>Course Number</td><td>Title</td>
+{% for class in suggested_courses %}
+    <tr><td>{{ class.department }} {{ class.course_number }}</td><td><a href="/courses/{{ class.id }}">{{ class.title }}</a></td></tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}
