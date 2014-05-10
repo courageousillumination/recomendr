@@ -112,7 +112,7 @@ $('#tag_search').typeahead({
     <h4>Semantically Similar Courses</h4>
     <table class="table">
     <thead>
-        <td>Title</td>
+        <td>Course ID</td><td>Title</td>
     {% for course in similar_courses %}
         <tr><td>{{ course.department }} {{ course.course_number }}</td><td><a href="/courses/{{ course.id }}">{{ course.title }}</a></td></tr>
     {% endfor %}

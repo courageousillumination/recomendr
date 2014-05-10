@@ -29,6 +29,8 @@ def course_page(request, course_id):
     similar_courses = recomendr.recomendr.lsi.get_similar_courses(course, 5)
     tagged_courses = [(tag, [x for x in tag.courses.all() if x != course]) for tag in course.tag_set.all()]
     my_tags = [(x, random.choice(y)) for x, y in tagged_courses if len(y) > 0]
+    if len(my_tags) > 5:
+        my_tags = random.sample(my_tags, 5)
     return render(request, "recomendr/course.html", {"course": course, "similar_courses": similar_courses, "tags" : tags, "my_tags" : my_tags})
 
 def search(request):
@@ -40,6 +42,9 @@ def search(request):
         return render(request, "recomendr/classes.html", {"classes": courses})
         
     return redirect('index')
+
+def random_course(request):
+    return redirect('recomendr.course_page', course_id=random.randint(1, Course.objects.count()))
 
 @login_required
 def my_courses(request):
