@@ -6,11 +6,11 @@ import pickle
 base_url = "http://collegecatalog.uchicago.edu"
 
 links = """
+<li><a href="/thecollege/chemistry/">Chemistry</a></li>
 <li><a href="/thecollege/anthropology/">Anthropology</a></li>
 <li><a href="/thecollege/arthistory/">Art History</a></li>
 <li><a href="/thecollege/biologicalchemistry/">Biological Chemistry</a></li>
 <li><a href="/thecollege/biologicalsciences/">Biological Sciences</a></li>
-<li><a href="/thecollege/chemistry/">Chemistry</a></li>
 <li><a href="/thecollege/cinemamediastudies/">Cinema and Media Studies</a></li>
 <li><a href="/thecollege/civilizationstudies/">Civilization Studies</a></li>
 <li><a href="/thecollege/classicalstudies/">Classical Studies</a></li>
@@ -61,15 +61,20 @@ links = """
 <li><a href="/thecollege/tutorialstudies/">Tutorial Studies</a></li>
 <li><a href="/thecollege/visualarts/">Visual Arts</a></li>
 """
-#courses = pickle.load(open("scraper/all_classes.p", "rb"))
-#l = []
-#for course in courses:
-#...     l.append(Course(description = course["description"], title=course["name"], course_number = course["id"].split(u'\xa0')[1], department = course["id"].split(u'\xa0')[0]))
-#Course.objects.bulk_create(l)
 
+"""
+import pickle
+from recomendr.recomendr.models import *
+courses = pickle.load(open("scraper/all_classes.p", "rb"))
+l = []
+for course in courses:
+     l.append(Course(description = course["description"], title=course["name"], course_number = course["id"].split(u'\xa0')[1], department = course["id"].split(u'\xa0')[0]))
+Course.objects.bulk_create(l)
+"""
 urls = [base_url + x for x in re.findall('(?<=<li><a href=").+(?=")', links)]
 
 all_classes = []
+current_sequence = ""
 for x in urls:
     tree = lxml.html.fromstring(requests.get(x).text)
 
@@ -78,9 +83,25 @@ for x in urls:
     for i in range(len(elements)):
         element = elements[i]
         
-        #No sequences
+        #Extract the description
+        description = ""
+        for child in element:
+            try:
+                if "courseblocktitle" in child.values()[0] or "courseblockdetail" in child.values()[0] :
+                    continue
+            except IndexError:
+                pass
+            description += child.text_content()
+            
+        
+        if "subsequence" in element.values()[0]:
+            description = current_sequence + description
+        else:
+            current_sequence = description
+            
         if i < len(elements) - 1 and "subsequence" in elements[i+1].values()[0] and not "subsequence" in element.values()[0]:
             continue
+        
         #Extract the title information
         
         title = element.find_class("courseblocktitle")[0].getchildren()[0].text_content()
@@ -92,10 +113,9 @@ for x in urls:
             print title
             
         
-        #Extract the description
         
-        description = element.find_class("courseblockdesc")[0].text_content()
-        
+        if len(description) < 10:
+            print title
         
         
         all_classes.append({"name": unicode(name), "id": unicode(identifier), "description": unicode(description)})
