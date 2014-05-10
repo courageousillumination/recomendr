@@ -12,6 +12,10 @@ class Course(models.Model):
     description = models.TextField()
     taken_by = models.ManyToManyField(User)
     
+class Tag(models.Model):
+    tag_name = models.CharField(max_length=512)
+    courses = models.ManyToManyField(Course)
+    
 class CourseInstance(models.Model):
     
     FALL = 'FA'

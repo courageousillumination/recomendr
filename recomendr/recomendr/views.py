@@ -1,3 +1,5 @@
+import random
+
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -15,9 +17,19 @@ def all_courses(request):
 
 def course_page(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
-    similar_courses = recomendr.recomendr.lsi.get_similar_courses(course, 10)
-    print similar_courses
-    return render(request, "recomendr/course.html", {"course": course, "similar_courses": similar_courses})
+    if request.method == "POST":
+        tag_name = request.POST["tag_name"]
+        #Normalize the name
+        tag_name = tag_name.lower()
+        tag_name = ' '.join([x.capitalize() for x in tag_name.split()])
+        t, _ = Tag.objects.get_or_create(tag_name = tag_name)
+        t.courses.add(course)
+        
+    tags = Tag.objects.all()
+    similar_courses = recomendr.recomendr.lsi.get_similar_courses(course, 5)
+    tagged_courses = [(tag, [x for x in tag.courses.all() if x != course]) for tag in course.tag_set.all()]
+    my_tags = [(x, random.choice(y)) for x, y in tagged_courses if len(y) > 0]
+    return render(request, "recomendr/course.html", {"course": course, "similar_courses": similar_courses, "tags" : tags, "my_tags" : my_tags})
 
 def search(request):
     if request.method == "GET":

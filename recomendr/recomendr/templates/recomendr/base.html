@@ -85,7 +85,7 @@ var substringMatcher = function(strs) {
   };
 };
 
-var states = [{% for course in courses %}'{{ course.title }}',{% endfor %}];
+var courses = [{% for course in courses %}'{{ course.title }}',{% endfor %}];
 
 $('#class_search').typeahead({
   hint: true,
@@ -93,9 +93,9 @@ $('#class_search').typeahead({
   minLength: 3
 },
 {
-  name: 'states',
+  name: 'courses',
   displayKey: 'value',
-  source: substringMatcher(states)
+  source: substringMatcher(courses)
 });
 
 </script>

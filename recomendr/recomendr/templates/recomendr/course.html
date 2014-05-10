@@ -1,15 +1,133 @@
 {% extends "recomendr/base.html" %}
 
+
+{% block additional_style_sheets %}
+<style>
+.tt-query,
+.tt-hint {
+    width: 396px;
+    height: 30px;
+    padding: 8px 12px;
+    font-size: 24px;
+    line-height: 30px;
+    border: 2px solid #ccc;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    outline: none;
+}
+
+.tt-query {
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+    color: #999
+}
+
+.tt-dropdown-menu {
+    width: 422px;
+    margin-top: 12px;
+    padding: 8px 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+    padding: 3px 20px;
+    font-size: 18px;
+    line-height: 24px;
+}
+
+.tt-suggestion.tt-is-under-cursor {
+    color: #fff;
+    background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+    margin: 0;
+}
+</style>
+{% endblock %}
+{% block additional_scripts %}
+<script src="{{ STATIC_URL }}js/typeahead.js"></script>
+<script>
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+ 
+    // an array that will be populated with substring matches
+    matches = [];
+ 
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+ 
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str });
+      }
+    });
+ 
+    cb(matches);
+  };
+};
+
+var tags = [{% for tag in tags %}'{{ tag.tag_name }}',{% endfor %}];
+
+$('#tag_search').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+},
+{
+  name: 'tags',
+  displayKey: 'value',
+  source: substringMatcher(tags)
+});
+
+</script>
+{% endblock %}
+
+
 {% block content %}
-{{ course.title }}<br>
+<h3>{{ course.title }}</h3>
 {{ course.description }}
-<table class="table">
-<thead>
-    <td>Title</td>
-{% for course in similar_courses %}
-    <tr><td>{{ course.department }} {{ course.course_number }}</td><td><a href="/courses/{{ course.id }}">{{ course.title }}</a></td></tr>
-{% endfor %}
-</table>
-
-
+<div>
+    <h3>Course Suggestions</h3>
+    <div class="col-md-6">
+    <h4>Semantically Similar Courses</h4>
+    <table class="table">
+    <thead>
+        <td>Title</td>
+    {% for course in similar_courses %}
+        <tr><td>{{ course.department }} {{ course.course_number }}</td><td><a href="/courses/{{ course.id }}">{{ course.title }}</a></td></tr>
+    {% endfor %}
+    </table>
+    </div>
+    <div class="col-md-6">
+    <h4>Courses with similar tags</h4>
+    {% for tag, course in my_tags %}
+        Do you like <strong>{{ tag.tag_name }}</strong>? Think about trying <a href="/courses/{{ course.id }}">{{ course.title }}</a>
+    {% endfor %}
+    <form method="post">
+        {% csrf_token %}
+        <input name="tag_name" id="tag_search" type="text" data-provide="typeahead" autocomplete="off" class="tt-query"></input>
+        <button type="submit" class="btn btn-default">Add Tag</button>
+    </form>
+    </div>
+</div>
 {% endblock %}
