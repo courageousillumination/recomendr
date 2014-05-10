@@ -104,8 +104,10 @@ $('#tag_search').typeahead({
 
 
 {% block content %}
-<h3>{{ course.title }}</h3>
+<span class="h3">{{ course.title }}</h3><small> ({{ course.department }} {{ course.course_number }})</small></span>
+<p>
 {{ course.description }}
+</p>
 <div>
     <h3>Course Suggestions</h3>
     <div class="col-md-6">
